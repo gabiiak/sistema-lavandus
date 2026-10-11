@@ -2,9 +2,12 @@ import { useState } from 'react'
 
 const VACIO = { nombre: '', pais: '' }
 
-// Alta de marca (solo ADMIN). El campo país es la procedencia de la marca.
-export default function FormularioMarca({ onGuardar, onCancelar }) {
-  const [datos, setDatos] = useState(VACIO)
+// Alta y edición de marca (solo ADMIN). El campo país es la procedencia de la marca.
+export default function FormularioMarca({ inicial, onGuardar, onCancelar }) {
+  const esNuevo = !inicial
+  const [datos, setDatos] = useState(
+    inicial ? { nombre: inicial.nombre, pais: inicial.pais } : VACIO
+  )
   const [error, setError] = useState('')
   const [enviando, setEnviando] = useState(false)
 
@@ -19,7 +22,7 @@ export default function FormularioMarca({ onGuardar, onCancelar }) {
     setEnviando(true)
     setError('')
     try {
-      await onGuardar(datos)
+      await onGuardar(datos, inicial?.idMarca)
     } catch (fallo) {
       setError(fallo.message || 'No se pudo guardar la marca')
       setEnviando(false)
@@ -28,7 +31,7 @@ export default function FormularioMarca({ onGuardar, onCancelar }) {
 
   return (
     <form className="formulario" onSubmit={enviar}>
-      <h2 className="modal__titulo">Nueva marca</h2>
+      <h2 className="modal__titulo">{esNuevo ? 'Nueva marca' : 'Editar marca'}</h2>
 
       <div className="formulario__grilla">
         <label className="campo">

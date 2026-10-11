@@ -53,6 +53,7 @@ export const api = {
   marcas: {
     listar: () => pedir('/marcas'),
     crear: (datos) => pedir('/marcas', { method: 'POST', body: JSON.stringify(datos) }),
+    editar: (id, datos) => pedir(`/marcas/${id}`, { method: 'PUT', body: JSON.stringify(datos) }),
   },
 }
 

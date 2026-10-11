@@ -246,6 +246,10 @@ select {
   background: var(--verde-claro);
 }
 
+.tabla tbody tr.fila--clic {
+  cursor: pointer;
+}
+
 .tabla tbody tr:last-child td {
   border-bottom: none;
 }

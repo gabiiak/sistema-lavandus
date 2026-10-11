@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { api } from '../api.js'
 import FormularioMarca from './FormularioMarca.jsx'
 
-// ABM de marcas (vista solo ADMIN): por ahora listar y crear.
+// ABM de marcas (vista solo ADMIN): listar, crear y editar.
 export default function Marcas() {
   const [marcas, setMarcas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
-  const [formulario, setFormulario] = useState(false)
+  // formulario: null | 'nueva' | marca a editar
+  const [formulario, setFormulario] = useState(null)
 
   const cargar = () => {
     setCargando(true)
@@ -21,9 +22,13 @@ export default function Marcas() {
 
   useEffect(cargar, [])
 
-  const guardar = async (datos) => {
-    await api.marcas.crear(datos)
-    setFormulario(false)
+  const guardar = async (datos, id) => {
+    if (id) {
+      await api.marcas.editar(id, datos)
+    } else {
+      await api.marcas.crear(datos)
+    }
+    setFormulario(null)
     cargar()
   }
 
@@ -35,7 +40,7 @@ export default function Marcas() {
     <>
       <div className="encabezado-pagina">
         <h1>Marcas</h1>
-        <button className="btn btn--primario" onClick={() => setFormulario(true)}>
+        <button className="btn btn--primario" onClick={() => setFormulario('nueva')}>
           Nueva marca
         </button>
       </div>
@@ -54,7 +59,12 @@ export default function Marcas() {
             </thead>
             <tbody>
               {marcas.map((marca) => (
-                <tr key={marca.idMarca}>
+                <tr
+                  key={marca.idMarca}
+                  className="fila--clic"
+                  title="Seleccionar para editar"
+                  onClick={() => setFormulario(marca)}
+                >
                   <td>{marca.idMarca}</td>
                   <td>{marca.nombre}</td>
                   <td>{marca.pais}</td>
@@ -66,12 +76,16 @@ export default function Marcas() {
       )}
 
       {formulario && (
-        <div className="modal-fondo" onClick={() => setFormulario(false)}>
+        <div className="modal-fondo" onClick={() => setFormulario(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal__cerrar" onClick={() => setFormulario(false)}>
+            <button className="modal__cerrar" onClick={() => setFormulario(null)}>
               ×
             </button>
-            <FormularioMarca onGuardar={guardar} onCancelar={() => setFormulario(false)} />
+            <FormularioMarca
+              inicial={formulario === 'nueva' ? null : formulario}
+              onGuardar={guardar}
+              onCancelar={() => setFormulario(null)}
+            />
           </div>
         </div>
       )}

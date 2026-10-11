@@ -29,4 +29,10 @@ public class MarcaController {
         Marca creada = marcaService.registrar(marca);
         return ResponseEntity.status(HttpStatus.CREATED).body(creada);
     }
+
+    // PUT /api/marcas/{id} -> modificar marca (solo ADMIN)
+    @PutMapping("/{id}")
+    public Marca editar(@PathVariable Integer id, @RequestBody Marca marca) {
+        return marcaService.editar(id, marca);
+    }
 }

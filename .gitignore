@@ -2,6 +2,9 @@
 AGENTS.md
 CAMBIOS.md
 MEMORY.md
+docs/
+specs/
+tests/
 
 # workspace de eclipse (local)
 .metadata/

@@ -1,28 +1,45 @@
-import { useState } from 'react'
-import { ESTADOS } from '../api.js'
+import { useEffect, useState } from 'react'
+import { api, ESTADOS } from '../api.js'
 
 // Valores por defecto para una máquina nueva
-const VACIO = { marca: '', tamano: '', modelo: '', procedencia: '', periodoMant: '', estado: 1 }
+const VACIO = { idMarca: '', tamano: '', modelo: '', periodoMant: '', estado: 1 }
 
 export default function FormularioMaquina({ inicial, onGuardar, onCancelar }) {
+  const [marcas, setMarcas] = useState([])
   const [datos, setDatos] = useState(
-    inicial ? { ...inicial, estado: inicial.estado ?? 1 } : VACIO
+    inicial
+      ? {
+          idMarca: inicial.marca?.idMarca ?? '',
+          tamano: inicial.tamano ?? '',
+          modelo: inicial.modelo ?? '',
+          periodoMant: inicial.periodoMant ?? '',
+          estado: inicial.estado ?? 1,
+        }
+      : VACIO
   )
   const [error, setError] = useState('')
   const [enviando, setEnviando] = useState(false)
 
+  // Cargamos las marcas para el desplegable al abrir el formulario.
+  useEffect(() => {
+    api.marcas.listar().then(setMarcas).catch(() => {})
+  }, [])
+
   const cambiar = (campo, valor) => setDatos((d) => ({ ...d, [campo]: valor }))
+
+  // La procedencia se deriva del país de la marca elegida (solo lectura).
+  const marcaElegida = marcas.find((m) => m.idMarca === Number(datos.idMarca))
 
   const enviar = async (e) => {
     e.preventDefault()
-    if (!datos.marca.trim() || !datos.modelo.trim()) {
+    if (!datos.idMarca || !datos.modelo.trim()) {
       setError('Marca y modelo son obligatorios')
       return
     }
     setEnviando(true)
     setError('')
     try {
-      await onGuardar(datos, inicial?.idMaquina)
+      await onGuardar({ ...datos, marca: { idMarca: Number(datos.idMarca) } }, inicial?.idMaquina)
     } catch (fallo) {
       setError(fallo.message || 'No se pudo guardar la máquina')
       setEnviando(false)
@@ -38,12 +55,18 @@ export default function FormularioMaquina({ inicial, onGuardar, onCancelar }) {
       <div className="formulario__grilla">
         <label className="campo">
           <span>Marca *</span>
-          <input
-            value={datos.marca}
-            onChange={(e) => cambiar('marca', e.target.value)}
-            placeholder="Ej: Samsung"
+          <select
+            value={datos.idMarca}
+            onChange={(e) => cambiar('idMarca', e.target.value)}
             required
-          />
+          >
+            <option value="">Seleccioná una marca</option>
+            {marcas.map((marca) => (
+              <option key={marca.idMarca} value={marca.idMarca}>
+                {marca.nombre}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="campo">
@@ -68,9 +91,9 @@ export default function FormularioMaquina({ inicial, onGuardar, onCancelar }) {
         <label className="campo">
           <span>Procedencia</span>
           <input
-            value={datos.procedencia}
-            onChange={(e) => cambiar('procedencia', e.target.value)}
-            placeholder="Ej: Nacional"
+            value={marcaElegida?.pais ?? ''}
+            readOnly
+            placeholder="Se completa con la marca"
           />
         </label>
 

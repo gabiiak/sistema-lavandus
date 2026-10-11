@@ -23,6 +23,14 @@ export default function BarraSuperior({ sesion, vista, onCambiarVista, onSalir }
             Empleados
           </button>
         )}
+        {esAdmin && (
+          <button
+            className={vista === 'marcas' ? 'barra__link activo' : 'barra__link'}
+            onClick={() => onCambiarVista('marcas')}
+          >
+            Marcas
+          </button>
+        )}
       </nav>
 
       <div className="barra__usuario">

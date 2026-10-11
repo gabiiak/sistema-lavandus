@@ -42,6 +42,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/maquinas/**").hasAnyRole("ADMIN", "EMPLEADO")
                 // Crear, modificar y eliminar máquinas: solo ADMIN
                 .requestMatchers("/api/maquinas/**").hasRole("ADMIN")
+                // Cualquiera logueado puede LISTAR y CONSULTAR marcas
+                .requestMatchers(HttpMethod.GET, "/api/marcas/**").hasAnyRole("ADMIN", "EMPLEADO")
+                // Crear marcas: solo ADMIN
+                .requestMatchers("/api/marcas/**").hasRole("ADMIN")
                 // Usuarios (empleados): solo ADMIN
                 .requestMatchers("/api/empleados/**").hasRole("ADMIN")
                 // Cualquier otra ruta exige estar logueado

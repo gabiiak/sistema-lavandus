@@ -36,7 +36,7 @@ export default function Maquinas({ rol }) {
   }
 
   const eliminar = async (maquina) => {
-    if (!confirm(`¿Eliminar la máquina ${maquina.marca} ${maquina.modelo}?`)) return
+    if (!confirm(`¿Eliminar la máquina ${maquina.marca?.nombre ?? ''} ${maquina.modelo}?`)) return
     try {
       await api.maquinas.eliminar(maquina.idMaquina)
       cargar()
@@ -83,10 +83,10 @@ export default function Maquinas({ rol }) {
                 return (
                   <tr key={m.idMaquina}>
                     <td>{m.idMaquina}</td>
-                    <td>{m.marca}</td>
+                    <td>{m.marca?.nombre}</td>
                     <td>{m.modelo}</td>
                     <td>{m.tamano}</td>
-                    <td>{m.procedencia}</td>
+                    <td>{m.marca?.pais}</td>
                     <td>{m.periodoMant}</td>
                     <td>
                       <span className={`estado-badge estado-badge--${info.clase}`}>
@@ -147,7 +147,7 @@ export default function Maquinas({ rol }) {
               </div>
               <div className="detalle__fila">
                 <dt>Marca</dt>
-                <dd>{detalle.marca}</dd>
+                <dd>{detalle.marca?.nombre}</dd>
               </div>
               <div className="detalle__fila">
                 <dt>Modelo</dt>
@@ -159,7 +159,7 @@ export default function Maquinas({ rol }) {
               </div>
               <div className="detalle__fila">
                 <dt>Procedencia</dt>
-                <dd>{detalle.procedencia}</dd>
+                <dd>{detalle.marca?.pais}</dd>
               </div>
               <div className="detalle__fila">
                 <dt>Período de mantenimiento</dt>

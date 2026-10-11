@@ -36,6 +36,12 @@ public class GlobalExceptionHandler {
         return responder(HttpStatus.BAD_REQUEST, "Los datos ingresados violan una restricción de la base", request);
     }
 
+    // 409: el recurso ya existe (ej: marca con nombre repetido)
+    @ExceptionHandler(RecursoDuplicadoException.class)
+    public ResponseEntity<ApiError> duplicado(RecursoDuplicadoException ex, HttpServletRequest request) {
+        return responder(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
     // 500: cualquier otro error
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> errorGeneral(Exception ex, HttpServletRequest request) {

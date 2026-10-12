@@ -1,5 +1,6 @@
 export default function BarraSuperior({ sesion, vista, onCambiarVista, onSalir }) {
   const esAdmin = sesion.rol === 'ADMIN'
+  const esEncargado = sesion.rol === 'ENCARGADO_SERVICIO'
 
   return (
     <header className="barra">
@@ -15,6 +16,14 @@ export default function BarraSuperior({ sesion, vista, onCambiarVista, onSalir }
         >
           Máquinas
         </button>
+        {(esAdmin || esEncargado) && (
+          <button
+            className={vista === 'servicios' ? 'barra__link activo' : 'barra__link'}
+            onClick={() => onCambiarVista('servicios')}
+          >
+            Servicios
+          </button>
+        )}
         {esAdmin && (
           <button
             className={vista === 'empleados' ? 'barra__link activo' : 'barra__link'}

@@ -94,8 +94,17 @@ public class SolicitudService {
                 .toList();
     }
 
-    // Convertimos la entidad en el DTO (evita la recursión del @OneToMany)
-    private SolicitudResponse aRespuesta(Solicitud solicitud) {
+    // Listar solo las solicitudes que todavía no tienen servicio (RF-1)
+    @Transactional(readOnly = true)
+    public List<SolicitudResponse> listarDisponibles() {
+        return solicitudRepository.findDisponibles().stream()
+                .map(this::aRespuesta)
+                .toList();
+    }
+
+    // Convertimos la entidad en el DTO (evita la recursión del @OneToMany).
+    // Es público para que ServicioService reutilice el mismo formato.
+    public SolicitudResponse aRespuesta(Solicitud solicitud) {
         List<SolicitudResponse.Detalle> detalles = solicitud.getDetalles().stream()
                 .map(d -> {
                     TipoPrenda tipo = d.getTipoPrenda();

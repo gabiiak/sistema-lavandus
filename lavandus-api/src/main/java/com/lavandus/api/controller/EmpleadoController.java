@@ -19,8 +19,8 @@ public class EmpleadoController {
     private EmpleadoService empleadoService;
 
     @GetMapping
-    public List<EmpleadoResponse> listar() {
-        return empleadoService.listar();
+    public List<EmpleadoResponse> listar(@RequestParam(required = false) String rol) {
+        return empleadoService.listar(rol);
     }
 
     @GetMapping("/{id}")

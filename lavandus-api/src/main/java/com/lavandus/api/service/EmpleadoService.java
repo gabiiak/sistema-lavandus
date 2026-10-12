@@ -24,8 +24,11 @@ public class EmpleadoService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public List<EmpleadoResponse> listar() {
-        return empleadoRepository.findAll().stream()
+    public List<EmpleadoResponse> listar(String rol) {
+        List<Empleado> empleados = (rol == null || rol.isBlank())
+                ? empleadoRepository.findAll()
+                : empleadoRepository.findByRol(rol);
+        return empleados.stream()
                 .map(this::aRespuesta)
                 .toList();
     }

@@ -30,4 +30,10 @@ public class SolicitudController {
     public List<SolicitudResponse> listar() {
         return solicitudService.listar();
     }
+
+    // GET /api/solicitudes/disponibles -> solicitudes sin servicio (RF-1)
+    @GetMapping("/disponibles")
+    public List<SolicitudResponse> listarDisponibles() {
+        return solicitudService.listarDisponibles();
+    }
 }

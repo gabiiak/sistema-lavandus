@@ -45,6 +45,7 @@ export const api = {
 
   empleados: {
     listar: () => pedir('/empleados'),
+    listarPorRol: (rol) => pedir(`/empleados?rol=${encodeURIComponent(rol)}`),
     crear: (datos) => pedir('/empleados', { method: 'POST', body: JSON.stringify(datos) }),
     editar: (id, datos) => pedir(`/empleados/${id}`, { method: 'PUT', body: JSON.stringify(datos) }),
     eliminar: (id) => pedir(`/empleados/${id}`, { method: 'DELETE' }),
@@ -63,6 +64,14 @@ export const api = {
   solicitudes: {
     crear: (datos) => pedir('/solicitudes', { method: 'POST', body: JSON.stringify(datos) }),
     listar: () => pedir('/solicitudes'),
+    disponibles: () => pedir('/solicitudes/disponibles'),
+  },
+
+  servicios: {
+    listar: () => pedir('/servicios'),
+    obtener: (id) => pedir(`/servicios/${id}`),
+    crear: (datos) => pedir('/servicios', { method: 'POST', body: JSON.stringify(datos) }),
+    actualizar: (id, datos) => pedir(`/servicios/${id}`, { method: 'PUT', body: JSON.stringify(datos) }),
   },
 }
 
@@ -75,3 +84,17 @@ export const ESTADOS = {
 }
 
 export const estadoInfo = (estado) => ESTADOS[estado] ?? { nombre: 'Desconocido', clase: 'fuera' }
+
+// Estados de servicio (deben coincidir con las constantes del backend).
+export const ESTADOS_SERVICIO = {
+  0: { nombre: 'Pendiente', clase: 'pendiente' },
+  1: { nombre: 'Programada', clase: 'programada' },
+  2: { nombre: 'En lavado', clase: 'lavado' },
+  3: { nombre: 'En secado', clase: 'secado' },
+  4: { nombre: 'En planchado', clase: 'planchado' },
+  5: { nombre: 'Terminado', clase: 'terminado' },
+  6: { nombre: 'Cancelada', clase: 'cancelada' },
+}
+
+export const estadoServicioInfo = (estado) =>
+  ESTADOS_SERVICIO[estado] ?? { nombre: 'Desconocido', clase: 'pendiente' }

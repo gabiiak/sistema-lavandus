@@ -643,3 +643,42 @@ select {
     padding: 1.5rem 1.25rem;
   }
 }
+
+/* --------------------------------------------------------------------------
+   15. SERVICIOS (panel de servicios de lavado)
+   -------------------------------------------------------------------------- */
+/* Estados de servicio: 0 pendiente ... 6 cancelada (ver backend) */
+.estado-badge--pendiente {
+  background: #e8edf2;
+  color: #52616f;
+}
+
+.estado-badge--programada {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.estado-badge--lavado {
+  background: #cfeef5;
+  color: #0e7490;
+}
+
+.estado-badge--secado {
+  background: #d5f0ea;
+  color: #0f766e;
+}
+
+.estado-badge--planchado {
+  background: #fdeccb;
+  color: #8a5a00;
+}
+
+.estado-badge--terminado {
+  background: #d9f2e5;
+  color: #0b6e4f;
+}
+
+.estado-badge--cancelada {
+  background: #fdeaea;
+  color: #b3352d;
+}

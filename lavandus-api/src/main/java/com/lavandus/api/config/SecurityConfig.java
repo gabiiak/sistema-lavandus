@@ -39,7 +39,7 @@ public class SecurityConfig {
                 // Permitimos el /error para ver los errores reales (no enmascarados como 403)
                 .requestMatchers("/error").permitAll()
                 // Cualquiera logueado puede LISTAR y CONSULTAR máquinas
-                .requestMatchers(HttpMethod.GET, "/api/maquinas/**").hasAnyRole("ADMIN", "EMPLEADO")
+                .requestMatchers(HttpMethod.GET, "/api/maquinas/**").hasAnyRole("ADMIN", "EMPLEADO", "ENCARGADO_SERVICIO")
                 // Crear, modificar y eliminar máquinas: solo ADMIN
                 .requestMatchers("/api/maquinas/**").hasRole("ADMIN")
                 // Cualquiera logueado puede LISTAR y CONSULTAR marcas
@@ -53,7 +53,13 @@ public class SecurityConfig {
                 // Consultar solicitudes: ADMIN o encargado de servicio
                 .requestMatchers(HttpMethod.GET, "/api/solicitudes", "/api/solicitudes/**")
                     .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
-                // Usuarios (empleados): solo ADMIN
+                // Servicios de lavado: ADMIN o encargado de servicio
+                .requestMatchers("/api/servicios", "/api/servicios/**")
+                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
+                // Listar empleados (con filtro ?rol=): ADMIN o encargado de servicio
+                .requestMatchers(HttpMethod.GET, "/api/empleados")
+                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
+                // Resto de usuarios (empleados): solo ADMIN
                 .requestMatchers("/api/empleados/**").hasRole("ADMIN")
                 // Cualquier otra ruta exige estar logueado
                 .anyRequest().authenticated()

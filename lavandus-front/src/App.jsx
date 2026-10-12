@@ -5,6 +5,7 @@ import BarraSuperior from './components/BarraSuperior.jsx'
 import Maquinas from './components/Maquinas.jsx'
 import Empleados from './components/Empleados.jsx'
 import Marcas from './components/Marcas.jsx'
+import Servicios from './components/Servicios.jsx'
 
 const SESION_KEY = 'lavandus.sesion'
 
@@ -14,12 +15,15 @@ export default function App() {
     const guardada = sessionStorage.getItem(SESION_KEY)
     return guardada ? JSON.parse(guardada) : null
   })
-  const [vista, setVista] = useState('maquinas')
+  const [vista, setVista] = useState(() =>
+    sesion?.rol === 'ENCARGADO_SERVICIO' ? 'servicios' : 'maquinas'
+  )
 
   const iniciarSesion = async (email, clave) => {
     const datos = await api.login(email, clave)
     sessionStorage.setItem(SESION_KEY, JSON.stringify(datos))
     setSesion(datos)
+    setVista(datos.rol === 'ENCARGADO_SERVICIO' ? 'servicios' : 'maquinas')
   }
 
   const cerrarSesion = async () => {
@@ -36,6 +40,7 @@ export default function App() {
   if (!sesion) return <Login onIngresar={iniciarSesion} />
 
   const esAdmin = sesion.rol === 'ADMIN'
+  const puedeServicios = esAdmin || sesion.rol === 'ENCARGADO_SERVICIO'
 
   return (
     <>
@@ -50,6 +55,8 @@ export default function App() {
           <Empleados />
         ) : vista === 'marcas' && esAdmin ? (
           <Marcas />
+        ) : vista === 'servicios' && puedeServicios ? (
+          <Servicios />
         ) : (
           <Maquinas rol={sesion.rol} />
         )}

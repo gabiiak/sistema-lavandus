@@ -16,7 +16,7 @@ import java.util.Set;
 public class EmpleadoService {
 
     // Únicos roles permitidos por ahora
-    private static final Set<String> ROLES_VALIDOS = Set.of("ADMIN", "EMPLEADO");
+    private static final Set<String> ROLES_VALIDOS = Set.of("ADMIN", "EMPLEADO", "ENCARGADO_SERVICIO");
 
     @Autowired
     private EmpleadoRepository empleadoRepository;
@@ -87,7 +87,7 @@ public class EmpleadoService {
 
     private void validarRol(String rol) {
         if (rol == null || !ROLES_VALIDOS.contains(rol)) {
-            throw new IllegalArgumentException("El rol debe ser ADMIN o EMPLEADO");
+            throw new IllegalArgumentException("El rol debe ser ADMIN, EMPLEADO o ENCARGADO_SERVICIO");
         }
     }
 

@@ -55,6 +55,15 @@ export const api = {
     crear: (datos) => pedir('/marcas', { method: 'POST', body: JSON.stringify(datos) }),
     editar: (id, datos) => pedir(`/marcas/${id}`, { method: 'PUT', body: JSON.stringify(datos) }),
   },
+
+  tiposPrenda: {
+    listar: () => pedir('/tipos-prenda'),
+  },
+
+  solicitudes: {
+    crear: (datos) => pedir('/solicitudes', { method: 'POST', body: JSON.stringify(datos) }),
+    listar: () => pedir('/solicitudes'),
+  },
 }
 
 // Estados de máquina (deben coincidir con las constantes del backend).

@@ -522,3 +522,124 @@ select {
     padding: 1.25rem 1rem;
   }
 }
+
+/* --------------------------------------------------------------------------
+   14. VISTA DE CLIENTE (solicitud pública de lavado)
+   -------------------------------------------------------------------------- */
+.cliente-fondo {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-principal));
+}
+
+.cliente-contenedor {
+  width: 100%;
+  max-width: 760px;
+  background: var(--superficie);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 2rem;
+}
+
+.cliente-cabecera {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.cliente-titulo {
+  font-size: 1.5rem;
+  color: var(--texto);
+}
+
+.cliente-subtitulo {
+  color: var(--texto-suave);
+  margin-top: 0.25rem;
+}
+
+.cliente-seccion {
+  font-size: 1.05rem;
+  margin: 1.75rem 0 0.75rem;
+}
+
+.cliente-fila {
+  display: grid;
+  grid-template-columns: 1fr 120px auto;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 0.75rem;
+}
+
+.cliente-quitar {
+  padding: 0.6rem 0.9rem;
+}
+
+.cliente-agregar {
+  width: 100%;
+  border-style: dashed;
+  color: var(--verde-principal);
+}
+
+.cliente-agregar:hover {
+  background: var(--verde-claro);
+}
+
+.cliente-resumen {
+  margin-top: 1.25rem;
+  background: var(--verde-claro);
+  border-radius: var(--radio-chico);
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cliente-resumen__dato {
+  display: flex;
+  flex-direction: column;
+}
+
+.cliente-resumen__etiqueta {
+  font-size: 0.8rem;
+  color: var(--verde-oscuro);
+}
+
+.cliente-resumen__valor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--verde-oscuro);
+}
+
+.cliente-exito {
+  text-align: center;
+}
+
+.cliente-exito h2 {
+  color: var(--verde-principal);
+  margin-bottom: 0.5rem;
+}
+
+.cliente-exito .detalle {
+  margin: 1.5rem 0;
+}
+
+.cliente-exito .formulario__acciones {
+  justify-content: center;
+}
+
+@media (max-width: 720px) {
+  .cliente-fila {
+    grid-template-columns: 1fr;
+  }
+
+  .cliente-quitar {
+    justify-self: start;
+  }
+
+  .cliente-contenedor {
+    padding: 1.5rem 1.25rem;
+  }
+}

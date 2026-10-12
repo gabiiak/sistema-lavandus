@@ -46,6 +46,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/marcas/**").hasAnyRole("ADMIN", "EMPLEADO")
                 // Crear marcas: solo ADMIN
                 .requestMatchers("/api/marcas/**").hasRole("ADMIN")
+                // Registrar solicitudes de lavado: público (vista de cliente, sin login)
+                .requestMatchers(HttpMethod.POST, "/api/solicitudes").permitAll()
+                // Tipos de prenda: público (los usa la vista de cliente)
+                .requestMatchers(HttpMethod.GET, "/api/tipos-prenda").permitAll()
+                // Consultar solicitudes: ADMIN o encargado de servicio
+                .requestMatchers(HttpMethod.GET, "/api/solicitudes", "/api/solicitudes/**")
+                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
                 // Usuarios (empleados): solo ADMIN
                 .requestMatchers("/api/empleados/**").hasRole("ADMIN")
                 // Cualquier otra ruta exige estar logueado

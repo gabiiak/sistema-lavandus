@@ -42,6 +42,9 @@ public class ServicioService {
     @Autowired
     private SolicitudService solicitudService;
 
+    @Autowired
+    private FacturaService facturaService;
+
     // Listar servicios (ADMIN y ENCARGADO_SERVICIO)
     @Transactional(readOnly = true)
     public List<ServicioResponse> listar() {
@@ -126,7 +129,12 @@ public class ServicioService {
                     "No se puede pasar del estado " + actual + " al estado " + nuevo);
         }
 
-        return aRespuesta(servicioRepository.save(servicio));
+        Servicio guardado = servicioRepository.save(servicio);
+        // Al terminar el servicio se emite la factura (una sola vez)
+        if (guardado.getEstado() == EstadoServicio.TERMINADO) {
+            facturaService.emitirPorTerminado(guardado);
+        }
+        return aRespuesta(guardado);
     }
 
     // Siguiente estado en la secuencia (null si es terminal o cancelada)

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, estadoServicioInfo } from '../api.js'
+import { api, estadoServicioInfo, estadoFacturaInfo } from '../api.js'
 import FormularioServicio from './FormularioServicio.jsx'
 
 // Siguiente estado en la secuencia (debe coincidir con el backend)
@@ -18,13 +18,28 @@ const esActivo = (estado) => estado !== 5 && estado !== 6
 const contarPrendas = (servicio) =>
   (servicio.solicitud?.detalles ?? []).reduce((total, d) => total + d.cantidad, 0)
 
-export default function Servicios() {
+// Formatea un LocalDateTime ISO a dd/mm/aaaa hh:mm
+const formatearFecha = (valor) => {
+  if (!valor) return '—'
+  return new Date(valor).toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export default function Servicios({ rol }) {
+  const esAdmin = rol === 'ADMIN'
   const [servicios, setServicios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [formulario, setFormulario] = useState(false)
   const [detalle, setDetalle] = useState(null)
   const [programar, setProgramar] = useState(null)
+  const [factura, setFactura] = useState(null)
+  const [cargandoFactura, setCargandoFactura] = useState(false)
 
   const cargar = () => {
     setCargando(true)
@@ -37,6 +52,18 @@ export default function Servicios() {
   }
 
   useEffect(cargar, [])
+
+  // Al abrir el detalle de un servicio TERMINADO, el ADMIN carga su factura.
+  useEffect(() => {
+    setFactura(null)
+    if (!detalle || !esAdmin || detalle.estado !== 5) return
+    setCargandoFactura(true)
+    api.facturas
+      .obtenerPorServicio(detalle.idServicio)
+      .then(setFactura)
+      .catch(() => setFactura(null))
+      .finally(() => setCargandoFactura(false))
+  }, [detalle, esAdmin])
 
   const crear = async (datos) => {
     await api.servicios.crear(datos)
@@ -63,6 +90,33 @@ export default function Servicios() {
   const cancelarServicio = (servicio) => {
     if (!confirm('¿Cancelar el servicio? La máquina (si tiene) quedará libre.')) return
     cambiarEstado(servicio, 6)
+  }
+
+  // Descarga el PDF de la factura (solo ADMIN)
+  const descargarFactura = async (idServicio) => {
+    try {
+      const blob = await api.facturas.descargarPdf(idServicio)
+      const url = URL.createObjectURL(blob)
+      const enlace = document.createElement('a')
+      enlace.href = url
+      enlace.download = `factura-${idServicio}.pdf`
+      document.body.appendChild(enlace)
+      enlace.click()
+      enlace.remove()
+      URL.revokeObjectURL(url)
+    } catch (fallo) {
+      alert(fallo.message)
+    }
+  }
+
+  // Reintenta el envío por correo de una factura NO_ENVIADA (solo ADMIN)
+  const reenviarFactura = async (idServicio) => {
+    try {
+      const actualizada = await api.facturas.enviar(idServicio)
+      setFactura(actualizada)
+    } catch (fallo) {
+      alert(fallo.message)
+    }
   }
 
   if (cargando) return <p className="aviso">Cargando servicios...</p>
@@ -252,6 +306,67 @@ export default function Servicios() {
                 </tbody>
               </table>
             </div>
+
+            {esAdmin && detalle.estado === 5 && (
+              <>
+                <h3 className="cliente-seccion">Factura</h3>
+                {cargandoFactura ? (
+                  <p className="aviso">Cargando factura...</p>
+                ) : factura ? (
+                  <>
+                    <dl className="detalle">
+                      <div className="detalle__fila">
+                        <dt>Estado</dt>
+                        <dd>
+                          <span
+                            className={`estado-badge estado-badge--${estadoFacturaInfo(factura.estado).clase}`}
+                          >
+                            {estadoFacturaInfo(factura.estado).nombre}
+                          </span>
+                        </dd>
+                      </div>
+                      <div className="detalle__fila">
+                        <dt>Email destino</dt>
+                        <dd>{factura.emailDestino}</dd>
+                      </div>
+                      <div className="detalle__fila">
+                        <dt>Fecha de emisión</dt>
+                        <dd>{formatearFecha(factura.fechaEmision)}</dd>
+                      </div>
+                      {factura.fechaEnvio && (
+                        <div className="detalle__fila">
+                          <dt>Fecha de envío</dt>
+                          <dd>{formatearFecha(factura.fechaEnvio)}</dd>
+                        </div>
+                      )}
+                    </dl>
+
+                    {factura.mensajeError && (
+                      <p className="aviso aviso--error">{factura.mensajeError}</p>
+                    )}
+
+                    <div className="formulario__acciones">
+                      <button
+                        className="btn"
+                        onClick={() => descargarFactura(detalle.idServicio)}
+                      >
+                        Descargar PDF
+                      </button>
+                      {factura.estado === 0 && (
+                        <button
+                          className="btn btn--primario"
+                          onClick={() => reenviarFactura(detalle.idServicio)}
+                        >
+                          Reenviar
+                        </button>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <p className="aviso">Todavía no hay factura para este servicio.</p>
+                )}
+              </>
+            )}
           </div>
         </div>
       )}

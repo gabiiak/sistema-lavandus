@@ -6,6 +6,7 @@ import Maquinas from './components/Maquinas.jsx'
 import Empleados from './components/Empleados.jsx'
 import Marcas from './components/Marcas.jsx'
 import Servicios from './components/Servicios.jsx'
+import TiposPrenda from './components/TiposPrenda.jsx'
 
 const SESION_KEY = 'lavandus.sesion'
 
@@ -55,8 +56,10 @@ export default function App() {
           <Empleados />
         ) : vista === 'marcas' && esAdmin ? (
           <Marcas />
+        ) : vista === 'tipos-prenda' && esAdmin ? (
+          <TiposPrenda />
         ) : vista === 'servicios' && puedeServicios ? (
-          <Servicios />
+          <Servicios rol={sesion.rol} />
         ) : (
           <Maquinas rol={sesion.rol} />
         )}

@@ -8,3 +8,6 @@ tests/
 
 # workspace de eclipse (local)
 .metadata/
+
+# PDFs de facturas generados en tiempo de ejecución (LDUS-54)
+lavandus-api/uploads/

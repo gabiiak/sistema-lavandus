@@ -50,6 +50,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/solicitudes").permitAll()
                 // Tipos de prenda: público (los usa la vista de cliente)
                 .requestMatchers(HttpMethod.GET, "/api/tipos-prenda").permitAll()
+                // Alta y edición de tipos de prenda: solo ADMIN
+                .requestMatchers("/api/tipos-prenda/**").hasRole("ADMIN")
                 // Consultar solicitudes: ADMIN o encargado de servicio
                 .requestMatchers(HttpMethod.GET, "/api/solicitudes", "/api/solicitudes/**")
                     .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
@@ -61,6 +63,8 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
                 // Resto de usuarios (empleados): solo ADMIN
                 .requestMatchers("/api/empleados/**").hasRole("ADMIN")
+                // Facturas (consultar, descargar PDF y reenviar): solo ADMIN
+                .requestMatchers("/api/facturas/**").hasRole("ADMIN")
                 // Cualquier otra ruta exige estar logueado
                 .anyRequest().authenticated()
             );

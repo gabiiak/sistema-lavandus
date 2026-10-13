@@ -30,6 +30,25 @@ async function pedir(path, opciones = {}) {
   return cuerpo
 }
 
+// helper para descargar archivos binarios (PDF) con la cookie de sesión
+async function pedirArchivo(path) {
+  let respuesta
+  try {
+    respuesta = await fetch(`${BASE_URL}${path}`, { credentials: 'include' })
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. ¿Está corriendo el backend?')
+  }
+
+  if (!respuesta.ok) {
+    const cuerpo = await respuesta.json().catch(() => null)
+    const error = new Error(cuerpo?.mensaje || `Error ${respuesta.status}`)
+    error.status = respuesta.status
+    throw error
+  }
+
+  return respuesta.blob()
+}
+
 export const api = {
   login: (email, clave) =>
     pedir('/auth/login', { method: 'POST', body: JSON.stringify({ email, clave }) }),
@@ -59,6 +78,9 @@ export const api = {
 
   tiposPrenda: {
     listar: () => pedir('/tipos-prenda'),
+    crear: (datos) => pedir('/tipos-prenda', { method: 'POST', body: JSON.stringify(datos) }),
+    editar: (id, datos) =>
+      pedir(`/tipos-prenda/${id}`, { method: 'PUT', body: JSON.stringify(datos) }),
   },
 
   solicitudes: {
@@ -72,6 +94,13 @@ export const api = {
     obtener: (id) => pedir(`/servicios/${id}`),
     crear: (datos) => pedir('/servicios', { method: 'POST', body: JSON.stringify(datos) }),
     actualizar: (id, datos) => pedir(`/servicios/${id}`, { method: 'PUT', body: JSON.stringify(datos) }),
+  },
+
+  facturas: {
+    obtenerPorServicio: (idServicio) => pedir(`/facturas/servicio/${idServicio}`),
+    enviar: (idServicio) =>
+      pedir(`/facturas/servicio/${idServicio}/enviar`, { method: 'POST' }),
+    descargarPdf: (idServicio) => pedirArchivo(`/facturas/servicio/${idServicio}/pdf`),
   },
 }
 
@@ -98,3 +127,12 @@ export const ESTADOS_SERVICIO = {
 
 export const estadoServicioInfo = (estado) =>
   ESTADOS_SERVICIO[estado] ?? { nombre: 'Desconocido', clase: 'pendiente' }
+
+// Estados de factura (deben coincidir con las constantes del backend).
+export const ESTADOS_FACTURA = {
+  0: { nombre: 'No enviada', clase: 'cancelada' },
+  1: { nombre: 'Enviada', clase: 'terminado' },
+}
+
+export const estadoFacturaInfo = (estado) =>
+  ESTADOS_FACTURA[estado] ?? { nombre: 'Desconocido', clase: 'pendiente' }

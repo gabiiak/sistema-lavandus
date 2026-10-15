@@ -32,6 +32,8 @@ const formatearFecha = (valor) => {
 
 export default function Servicios({ rol }) {
   const esAdmin = rol === 'ADMIN'
+  // Solo ADMIN y el encargado de operaciones registran servicios y asignan máquina.
+  const puedeRegistrar = esAdmin || rol === 'ENCARGADO_OPERACIONES'
   const [servicios, setServicios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -127,9 +129,11 @@ export default function Servicios({ rol }) {
     <>
       <div className="encabezado-pagina">
         <h1>Servicios de lavado</h1>
-        <button className="btn btn--primario" onClick={() => setFormulario(true)}>
-          Nuevo servicio
-        </button>
+        {puedeRegistrar && (
+          <button className="btn btn--primario" onClick={() => setFormulario(true)}>
+            Nuevo servicio
+          </button>
+        )}
       </div>
 
       {servicios.length === 0 ? (
@@ -175,7 +179,7 @@ export default function Servicios({ rol }) {
                       <button className="btn btn--texto" onClick={() => setDetalle(s)}>
                         Ver
                       </button>
-                      {esActivo(s.estado) && (
+                      {esActivo(s.estado) && (s.estado !== 0 || puedeRegistrar) && (
                         <button
                           className="btn btn--texto"
                           onClick={() =>

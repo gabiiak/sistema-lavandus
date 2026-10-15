@@ -1,10 +1,11 @@
 -- Seed reproducible: usuarios de prueba del sistema.
 -- Corre en cada arranque; ON CONFLICT (email) DO NOTHING evita duplicar o pisar datos existentes.
--- Las claves son hashes BCrypt: admin123 (ADMIN), empleado123 (EMPLEADO) y encargado123 (ENCARGADO_SERVICIO).
+-- Las claves son hashes BCrypt: admin123 (ADMIN), encargado123 (ENCARGADO_SERVICIO)
+-- y operaciones123 (ENCARGADO_OPERACIONES).
 INSERT INTO empleado (nombre, apellido, email, clave, genero, rol) VALUES
     ('Admin', 'Lavandus', 'admin@lavandus.com', '$2a$10$pKN2hUHVGRRuyHA36SyAGuPrWeUupCvqNHrOBFTij0nYx65Qw7PDO', NULL, 'ADMIN'),
-    ('Empleado', 'Prueba', 'empleado@lavandus.com', '$2a$10$CE8uKRK7mrp1Kh0WFwrH6.4uRHIhvQbCg1qpQpC4lZv.LDQFp1Gr.', NULL, 'EMPLEADO'),
-    ('Encargado', 'Servicio', 'encargado@lavandus.com', '$2a$10$ubTH2lz1iusVkelACnO4I.2FZI4N3p5RY4it72d6PgDSZLWskXHnO', NULL, 'ENCARGADO_SERVICIO')
+    ('Encargado', 'Servicio', 'encargado@lavandus.com', '$2a$10$ubTH2lz1iusVkelACnO4I.2FZI4N3p5RY4it72d6PgDSZLWskXHnO', NULL, 'ENCARGADO_SERVICIO'),
+    ('Encargado', 'Operaciones', 'operaciones@lavandus.com', '$2a$10$pjJMqWK0o6rSV8q0tAOZLucbb0wfx/pmgKBOCpQm3z1o.K3C.RvRi', NULL, 'ENCARGADO_OPERACIONES')
 ON CONFLICT (email) DO NOTHING;
 
 -- No se siembran máquinas: la tabla no tiene una restricción de unicidad y

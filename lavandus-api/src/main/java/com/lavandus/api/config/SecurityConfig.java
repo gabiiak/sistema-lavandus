@@ -38,12 +38,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Permitimos el /error para ver los errores reales (no enmascarados como 403)
                 .requestMatchers("/error").permitAll()
-                // Cualquiera logueado puede LISTAR y CONSULTAR máquinas
-                .requestMatchers(HttpMethod.GET, "/api/maquinas/**").hasAnyRole("ADMIN", "EMPLEADO", "ENCARGADO_SERVICIO")
+                // Listar y consultar máquinas: ADMIN y encargados
+                .requestMatchers(HttpMethod.GET, "/api/maquinas/**")
+                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO", "ENCARGADO_OPERACIONES")
                 // Crear, modificar y eliminar máquinas: solo ADMIN
                 .requestMatchers("/api/maquinas/**").hasRole("ADMIN")
-                // Cualquiera logueado puede LISTAR y CONSULTAR marcas
-                .requestMatchers(HttpMethod.GET, "/api/marcas/**").hasAnyRole("ADMIN", "EMPLEADO")
+                // Listar y consultar marcas: solo ADMIN
+                .requestMatchers(HttpMethod.GET, "/api/marcas/**").hasRole("ADMIN")
                 // Crear marcas: solo ADMIN
                 .requestMatchers("/api/marcas/**").hasRole("ADMIN")
                 // Registrar solicitudes de lavado: público (vista de cliente, sin login)
@@ -52,15 +53,21 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/tipos-prenda").permitAll()
                 // Alta y edición de tipos de prenda: solo ADMIN
                 .requestMatchers("/api/tipos-prenda/**").hasRole("ADMIN")
-                // Consultar solicitudes: ADMIN o encargado de servicio
+                // Consultar solicitudes: ADMIN o encargado de operaciones
                 .requestMatchers(HttpMethod.GET, "/api/solicitudes", "/api/solicitudes/**")
-                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
-                // Servicios de lavado: ADMIN o encargado de servicio
+                    .hasAnyRole("ADMIN", "ENCARGADO_OPERACIONES")
+                // Listar y consultar servicios: ADMIN y encargados
+                .requestMatchers(HttpMethod.GET, "/api/servicios", "/api/servicios/**")
+                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO", "ENCARGADO_OPERACIONES")
+                // Registrar servicios (asignar empleado/máquina): ADMIN o encargado de operaciones
+                .requestMatchers(HttpMethod.POST, "/api/servicios")
+                    .hasAnyRole("ADMIN", "ENCARGADO_OPERACIONES")
+                // Cambiar estado de un servicio: ADMIN y encargados
                 .requestMatchers("/api/servicios", "/api/servicios/**")
-                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
-                // Listar empleados (con filtro ?rol=): ADMIN o encargado de servicio
+                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO", "ENCARGADO_OPERACIONES")
+                // Listar empleados (con filtro ?rol=): ADMIN o encargado de operaciones
                 .requestMatchers(HttpMethod.GET, "/api/empleados")
-                    .hasAnyRole("ADMIN", "ENCARGADO_SERVICIO")
+                    .hasAnyRole("ADMIN", "ENCARGADO_OPERACIONES")
                 // Resto de usuarios (empleados): solo ADMIN
                 .requestMatchers("/api/empleados/**").hasRole("ADMIN")
                 // Facturas (consultar, descargar PDF y reenviar): solo ADMIN

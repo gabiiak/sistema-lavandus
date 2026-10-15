@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const VACIO = { nombre: '', apellido: '', email: '', genero: '', rol: 'EMPLEADO', clave: '' }
+const VACIO = { nombre: '', apellido: '', email: '', genero: '', rol: 'ENCARGADO_SERVICIO', clave: '' }
 
 export default function FormularioEmpleado({ inicial, onGuardar, onCancelar }) {
   const esNuevo = !inicial
@@ -84,7 +84,8 @@ export default function FormularioEmpleado({ inicial, onGuardar, onCancelar }) {
         <label className="campo">
           <span>Rol *</span>
           <select value={datos.rol} onChange={(e) => cambiar('rol', e.target.value)}>
-            <option value="EMPLEADO">EMPLEADO</option>
+            <option value="ENCARGADO_SERVICIO">ENCARGADO_SERVICIO</option>
+            <option value="ENCARGADO_OPERACIONES">ENCARGADO_OPERACIONES</option>
             <option value="ADMIN">ADMIN</option>
           </select>
         </label>

@@ -23,7 +23,7 @@ public class UsuarioDetailsService implements UserDetailsService {
 
         return User.withUsername(empleado.getEmail())
                 .password(empleado.getClave())
-                // "ADMIN" -> ROLE_ADMIN, "EMPLEADO" -> ROLE_EMPLEADO
+                // "ADMIN" -> ROLE_ADMIN, "ENCARGADO_SERVICIO" -> ROLE_ENCARGADO_SERVICIO, etc.
                 .roles(empleado.getRol())
                 .build();
     }

@@ -45,7 +45,7 @@ public class ServicioService {
     @Autowired
     private FacturaService facturaService;
 
-    // Listar servicios (ADMIN y ENCARGADO_SERVICIO)
+    // Listar servicios (ADMIN y encargados)
     @Transactional(readOnly = true)
     public List<ServicioResponse> listar() {
         return servicioRepository.findAll().stream()

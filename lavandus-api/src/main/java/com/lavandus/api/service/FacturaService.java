@@ -44,9 +44,6 @@ public class FacturaService {
     @Value("${lavandus.facturas.remitente}")
     private String remitente;
 
-    @Value("${lavandus.facturas.dominio-permitido}")
-    private String dominioPermitido;
-
     // Se llama cuando un servicio pasa a TERMINADO. Nunca lanza: si algo falla,
     // el servicio igual queda terminado y la factura queda NO_ENVIADA.
     public void emitirPorTerminado(Servicio servicio) {
@@ -62,16 +59,11 @@ public class FacturaService {
             factura.setEstado(FacturaEstado.NO_ENVIADA);
             factura.setRutaArchivo(facturaPdfService.generar(servicio, factura.getFechaEmision()));
 
-            if (!dominioPermitido(factura.getEmailDestino())) {
-                factura.setMensajeError("El mail " + factura.getEmailDestino()
-                        + " no pertenece al dominio permitido @" + dominioPermitido);
-            } else {
-                try {
-                    enviarCorreo(factura);
-                } catch (Exception e) {
-                    factura.setEstado(FacturaEstado.NO_ENVIADA);
-                    factura.setMensajeError(recortar(mensajeDe(e)));
-                }
+            try {
+                enviarCorreo(factura);
+            } catch (Exception e) {
+                factura.setEstado(FacturaEstado.NO_ENVIADA);
+                factura.setMensajeError(recortar(mensajeDe(e)));
             }
 
             facturaRepository.save(factura);
@@ -98,7 +90,7 @@ public class FacturaService {
         return new FileSystemResource(ruta);
     }
 
-    // Reintenta el envío manualmente (solo ADMIN). Lanza 400 si el mail no es reconocido.
+    // Reintenta el envío manualmente (solo ADMIN). Lanza 400 si ya fue enviada o no hay SMTP.
     @Transactional
     public FacturaResponse enviar(Integer idServicio) {
         Factura factura = buscarPorServicio(idServicio);
@@ -106,7 +98,6 @@ public class FacturaService {
         if (factura.getEstado() == FacturaEstado.ENVIADA) {
             throw new IllegalArgumentException("La factura del servicio " + idServicio + " ya fue enviada");
         }
-        validarDominio(factura.getEmailDestino());
 
         try {
             enviarCorreo(factura);
@@ -150,17 +141,6 @@ public class FacturaService {
         } catch (Exception e) {
             throw new IllegalStateException(mensajeDe(e), e);
         }
-    }
-
-    private void validarDominio(String email) {
-        if (!dominioPermitido(email)) {
-            throw new IllegalArgumentException("El sistema no reconoce el mail " + email
-                    + ". Solo se permiten mails del dominio @" + dominioPermitido);
-        }
-    }
-
-    private boolean dominioPermitido(String email) {
-        return email != null && email.toLowerCase().endsWith("@" + dominioPermitido.toLowerCase());
     }
 
     private Factura buscarPorServicio(Integer idServicio) {

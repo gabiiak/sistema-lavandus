@@ -86,7 +86,7 @@ public class SolicitudService {
         return aRespuesta(solicitudRepository.save(solicitud));
     }
 
-    // Listar solicitudes (ADMIN y ENCARGADO_SERVICIO)
+    // Listar solicitudes (ADMIN y ENCARGADO_OPERACIONES)
     @Transactional(readOnly = true)
     public List<SolicitudResponse> listar() {
         return solicitudRepository.findAll().stream()

@@ -10,21 +10,23 @@ import TiposPrenda from './components/TiposPrenda.jsx'
 
 const SESION_KEY = 'lavandus.sesion'
 
+// Los encargados (servicio y operaciones) aterrizan en la pestaña Servicios.
+const vistaInicial = (rol) =>
+  rol === 'ENCARGADO_SERVICIO' || rol === 'ENCARGADO_OPERACIONES' ? 'servicios' : 'maquinas'
+
 export default function App() {
   // Si hay sesión guardada en sessionStorage, no pedimos login de nuevo.
   const [sesion, setSesion] = useState(() => {
     const guardada = sessionStorage.getItem(SESION_KEY)
     return guardada ? JSON.parse(guardada) : null
   })
-  const [vista, setVista] = useState(() =>
-    sesion?.rol === 'ENCARGADO_SERVICIO' ? 'servicios' : 'maquinas'
-  )
+  const [vista, setVista] = useState(() => vistaInicial(sesion?.rol))
 
   const iniciarSesion = async (email, clave) => {
     const datos = await api.login(email, clave)
     sessionStorage.setItem(SESION_KEY, JSON.stringify(datos))
     setSesion(datos)
-    setVista(datos.rol === 'ENCARGADO_SERVICIO' ? 'servicios' : 'maquinas')
+    setVista(vistaInicial(datos.rol))
   }
 
   const cerrarSesion = async () => {
@@ -41,7 +43,8 @@ export default function App() {
   if (!sesion) return <Login onIngresar={iniciarSesion} />
 
   const esAdmin = sesion.rol === 'ADMIN'
-  const puedeServicios = esAdmin || sesion.rol === 'ENCARGADO_SERVICIO'
+  const puedeServicios =
+    esAdmin || sesion.rol === 'ENCARGADO_SERVICIO' || sesion.rol === 'ENCARGADO_OPERACIONES'
 
   return (
     <>

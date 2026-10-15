@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 // Verifica el envío de facturas sin depender de un SMTP real (JavaMailSender mockeado).
@@ -53,7 +52,6 @@ class FacturaServiceTest {
     void setUp() throws Exception {
         ReflectionTestUtils.setField(facturaService, "mailHost", "smtp.test.com");
         ReflectionTestUtils.setField(facturaService, "remitente", "facturacion@lavandus.com");
-        ReflectionTestUtils.setField(facturaService, "dominioPermitido", "copytosh.com");
         pdf = File.createTempFile("factura-", ".pdf");
         pdf.deleteOnExit();
     }
@@ -74,8 +72,8 @@ class FacturaServiceTest {
     }
 
     @Test
-    void enviarConDominioPermitidoMarcaEnviada() throws Exception {
-        Factura factura = facturaDePrueba("cliente@copytosh.com");
+    void enviarMarcaEnviada() throws Exception {
+        Factura factura = facturaDePrueba("cliente@cualquier-dominio.com");
         when(mailSenderProvider.getIfAvailable()).thenReturn(mailSender);
         when(mailSender.createMimeMessage())
                 .thenReturn(new MimeMessage(Session.getInstance(new Properties())));
@@ -88,19 +86,8 @@ class FacturaServiceTest {
     }
 
     @Test
-    void enviarConDominioNoPermitidoDevuelve400() {
-        facturaDePrueba("cliente@gmail.com");
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> facturaService.enviar(1));
-
-        assertTrue(ex.getMessage().contains("no reconoce"));
-        verifyNoInteractions(mailSender);
-    }
-
-    @Test
     void enviarSinSmtpConfiguradoDevuelve400() {
-        Factura factura = facturaDePrueba("cliente@copytosh.com");
+        Factura factura = facturaDePrueba("cliente@cualquier-dominio.com");
         ReflectionTestUtils.setField(facturaService, "mailHost", "");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,

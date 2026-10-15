@@ -18,7 +18,7 @@ public class ServicioController {
     @Autowired
     private ServicioService servicioService;
 
-    // GET /api/servicios -> listar servicios (ADMIN y ENCARGADO_SERVICIO)
+    // GET /api/servicios -> listar servicios (ADMIN y encargados)
     @GetMapping
     public List<ServicioResponse> listar() {
         return servicioService.listar();

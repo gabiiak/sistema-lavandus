@@ -15,7 +15,7 @@ public class MarcaService {
     @Autowired
     private MarcaRepository marcaRepository;
 
-    // Listar todas las marcas (ADMIN y EMPLEADO)
+    // Listar todas las marcas (solo ADMIN)
     public List<Marca> listar() {
         return marcaRepository.findAll();
     }

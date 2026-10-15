@@ -19,12 +19,12 @@ public class MaquinaService {
     @Autowired
     private MarcaRepository marcaRepository;
 
-    // Listar todas las máquinas (ADMIN y EMPLEADO)
+    // Listar todas las máquinas (ADMIN y encargados)
     public List<MaquinaLavadora> obtenerTodas() {
         return maquinaRepository.findAll();
     }
 
-    // Consultar una máquina por id (ADMIN y EMPLEADO)
+    // Consultar una máquina por id (ADMIN y encargados)
     public MaquinaLavadora obtenerPorId(Integer id) {
         return buscarOErro(id);
     }

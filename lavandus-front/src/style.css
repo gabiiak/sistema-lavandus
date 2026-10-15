@@ -10,7 +10,7 @@
    1. VARIABLES GLOBALES (paleta de colores y medidas de referencia)
    -------------------------------------------------------------------------- */
 :root {
-  --verde-principal: #0b6e4f;
+  --verde-principal: #42855e;
   --verde-oscuro: #085c41;
   --verde-claro: #e6f2ec;
   --fondo: #f2f5f7;
@@ -28,9 +28,7 @@
 /* --------------------------------------------------------------------------
    2. RESET Y BASE
    -------------------------------------------------------------------------- */
-* {
-  box-sizing: border-box;
-}
+
 
 html,
 body {
@@ -40,7 +38,7 @@ body {
 
 body {
   font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  background: var(--fondo);
+  background: linear-gradient(160deg, rgb(234, 240, 235), rgb(201, 223, 204), rgb(152, 207, 155));
   color: var(--texto);
   min-height: 100vh;
 }
@@ -75,9 +73,8 @@ select {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-principal));
+  background: linear-gradient(160deg, #393f3d, #26cf6d);
 }
-
 .login-tarjeta {
   background: var(--superficie);
   border-radius: var(--radio);
@@ -116,6 +113,7 @@ select {
 
 .login-tarjeta .campo + .campo {
   margin-top: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -193,7 +191,7 @@ select {
    5. CONTENIDO PRINCIPAL
    -------------------------------------------------------------------------- */
 .contenido {
-  max-width: 1100px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
@@ -235,7 +233,7 @@ select {
 }
 
 .tabla thead th {
-  background: var(--verde-principal);
+  background: #588927;
   color: #fff;
   font-size: 0.78rem;
   text-transform: uppercase;
@@ -291,7 +289,7 @@ select {
 
 /* Roles de usuario */
 .rol-badge--admin {
-  background: var(--verde-principal);
+  background: #ab95d2;;
   color: #fff;
 }
 
@@ -317,13 +315,13 @@ select {
 }
 
 .btn--primario {
-  background: var(--verde-principal);
-  border-color: var(--verde-principal);
+  background: #588927;
+  border-color: #588927;
   color: #fff;
 }
 
 .btn--primario:hover {
-  background: var(--verde-oscuro);
+  background: #728f35;
 }
 
 .btn--ancho {
@@ -443,7 +441,7 @@ select {
   box-shadow: var(--sombra);
   padding: 1.75rem;
   width: 100%;
-  max-width: 520px;
+  max-width: 720px;
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
@@ -532,7 +530,7 @@ select {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-principal));
+  background: linear-gradient(160deg, rgb(158, 208, 224), rgba(219, 255, 224), rgb(221, 155, 221));
 }
 
 .cliente-contenedor {
@@ -577,7 +575,7 @@ select {
 }
 
 .cliente-agregar {
-  width: 100%;
+  width:100%;
   border-style: dashed;
   color: var(--verde-principal);
 }

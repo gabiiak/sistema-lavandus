@@ -1,6 +1,7 @@
 export default function BarraSuperior({ sesion, vista, onCambiarVista, onSalir }) {
   const esAdmin = sesion.rol === 'ADMIN'
-  const esEncargado = sesion.rol === 'ENCARGADO_SERVICIO'
+  const esEncargado =
+    sesion.rol === 'ENCARGADO_SERVICIO' || sesion.rol === 'ENCARGADO_OPERACIONES'
 
   return (
     <header className="barra">

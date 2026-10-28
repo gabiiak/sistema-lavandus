@@ -69,10 +69,10 @@ export default function TiposPrenda() {
                   title="Seleccionar para editar"
                   onClick={() => setFormulario(tipo)}
                 >
-                  <td>{tipo.idTipoPrenda}</td>
-                  <td>{tipo.nombre}</td>
-                  <td>{tipo.peso} kg</td>
-                  <td>{tarifa(tipo.precio)}</td>
+                  <td data-label="N°">{tipo.idTipoPrenda}</td>
+                  <td data-label="Nombre">{tipo.nombre}</td>
+                  <td data-label="Peso estimado">{tipo.peso} kg</td>
+                  <td data-label="Tarifa">{tarifa(tipo.precio)}</td>
                 </tr>
               ))}
             </tbody>

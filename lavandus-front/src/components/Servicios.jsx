@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { api, estadoServicioInfo, estadoFacturaInfo } from '../api.js'
 import FormularioServicio from './FormularioServicio.jsx'
 
@@ -12,6 +12,16 @@ const ACCION = {
   3: 'Iniciar planchado',
   4: 'Terminar',
 }
+
+const ESTADOS_LISTA = [
+  { valor: '0', nombre: 'Pendiente' },
+  { valor: '1', nombre: 'Programado' },
+  { valor: '2', nombre: 'En lavado' },
+  { valor: '3', nombre: 'En secado' },
+  { valor: '4', nombre: 'En planchado' },
+  { valor: '5', nombre: 'Terminado' },
+  { valor: '6', nombre: 'Cancelado' },
+]
 
 const esActivo = (estado) => estado !== 5 && estado !== 6
 
@@ -32,8 +42,8 @@ const formatearFecha = (valor) => {
 
 export default function Servicios({ rol }) {
   const esAdmin = rol === 'ADMIN'
-  // Solo ADMIN y el encargado de operaciones registran servicios y asignan máquina.
   const puedeRegistrar = esAdmin || rol === 'ENCARGADO_OPERACIONES'
+
   const [servicios, setServicios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -42,6 +52,16 @@ export default function Servicios({ rol }) {
   const [programar, setProgramar] = useState(null)
   const [factura, setFactura] = useState(null)
   const [cargandoFactura, setCargandoFactura] = useState(false)
+
+  // Estado para los filtros operativos / tácticos
+  const [filtros, setFiltros] = useState({
+    busqueda: '',
+    estado: '',
+    idEmpleado: '',
+    idMaquina: '',
+    fechaDesde: '',
+    fechaHasta: '',
+  })
 
   const cargar = () => {
     setCargando(true)
@@ -67,13 +87,87 @@ export default function Servicios({ rol }) {
       .finally(() => setCargandoFactura(false))
   }, [detalle, esAdmin])
 
+  // Listas únicas de empleados y máquinas presentes para los selectores de filtro
+  const empleadosUnicos = useMemo(() => {
+    const mapa = new Map()
+    servicios.forEach((s) => {
+      if (s.empleado) mapa.set(s.empleado.idEmpleado, s.empleado)
+    })
+    return Array.from(mapa.values())
+  }, [servicios])
+
+  const maquinasUnicas = useMemo(() => {
+    const mapa = new Map()
+    servicios.forEach((s) => {
+      if (s.maquina) mapa.set(s.maquina.idMaquina, s.maquina)
+    })
+    return Array.from(mapa.values())
+  }, [servicios])
+
+  // Aplicación de los filtros operativos sobre la lista de servicios
+  const serviciosFiltrados = useMemo(() => {
+    return servicios.filter((s) => {
+      if (filtros.estado !== '' && String(s.estado) !== filtros.estado) return false
+      if (filtros.idEmpleado !== '' && String(s.empleado?.idEmpleado) !== filtros.idEmpleado)
+        return false
+      if (filtros.idMaquina !== '') {
+        if (filtros.idMaquina === 'SIN_ASIGNAR' && s.maquina) return false
+        if (filtros.idMaquina !== 'SIN_ASIGNAR' && String(s.maquina?.idMaquina) !== filtros.idMaquina)
+          return false
+      }
+      if (filtros.busqueda.trim() !== '') {
+        const q = filtros.busqueda.toLowerCase()
+        const cliente = (s.solicitud?.razonSocial ?? '').toLowerCase()
+        const nombre = (s.solicitud?.nombreCliente ?? '').toLowerCase()
+        const email = (s.solicitud?.email ?? '').toLowerCase()
+        const nro = String(s.idServicio)
+        if (!cliente.includes(q) && !nombre.includes(q) && !email.includes(q) && !nro.includes(q)) {
+          return false
+        }
+      }
+      if (filtros.fechaDesde && s.fechaAlta) {
+        const fechaServ = new Date(s.fechaAlta).setHours(0, 0, 0, 0)
+        const desde = new Date(filtros.fechaDesde + 'T00:00:00').getTime()
+        if (fechaServ < desde) return false
+      }
+      if (filtros.fechaHasta && s.fechaAlta) {
+        const fechaServ = new Date(s.fechaAlta).setHours(23, 59, 59, 999)
+        const hasta = new Date(filtros.fechaHasta + 'T23:59:59').getTime()
+        if (fechaServ > hasta) return false
+      }
+      return true
+    })
+  }, [servicios, filtros])
+
+  // Cálculo de totales operativos sobre los datos filtrados
+  const resumenOperativo = useMemo(() => {
+    return serviciosFiltrados.reduce(
+      (acc, s) => {
+        acc.prendas += contarPrendas(s)
+        acc.kilos += Number(s.solicitud?.pesoTotal ?? 0)
+        acc.monto += Number(s.solicitud?.precioEstimado ?? 0)
+        return acc
+      },
+      { prendas: 0, kilos: 0, monto: 0 }
+    )
+  }, [serviciosFiltrados])
+
+  const limpiarFiltros = () =>
+    setFiltros({
+      busqueda: '',
+      estado: '',
+      idEmpleado: '',
+      idMaquina: '',
+      fechaDesde: '',
+      fechaHasta: '',
+    })
+
   const crear = async (datos) => {
     await api.servicios.crear(datos)
     setFormulario(false)
     cargar()
   }
 
-  // Cambia el estado del servicio (y la máquina si corresponde)
   const cambiarEstado = async (servicio, estado, idMaquina) => {
     try {
       await api.servicios.actualizar(servicio.idServicio, {
@@ -94,7 +188,6 @@ export default function Servicios({ rol }) {
     cambiarEstado(servicio, 6)
   }
 
-  // Descarga el PDF de la factura (solo ADMIN)
   const descargarFactura = async (idServicio) => {
     try {
       const blob = await api.facturas.descargarPdf(idServicio)
@@ -111,7 +204,6 @@ export default function Servicios({ rol }) {
     }
   }
 
-  // Reintenta el envío por correo de una factura NO_ENVIADA (solo ADMIN)
   const reenviarFactura = async (idServicio) => {
     try {
       const actualizada = await api.facturas.enviar(idServicio)
@@ -136,14 +228,108 @@ export default function Servicios({ rol }) {
         )}
       </div>
 
-      {servicios.length === 0 ? (
-        <p className="aviso">Todavía no hay servicios registrados.</p>
+      {/* =================================================================
+          LISTADO E INFORME OPERATIVO / TÁCTICO (PARAMETRIZADO)
+         ================================================================= */}
+      <section className="glass-filtros">
+        <div className="glass-filtros__encabezado">
+          <h3>Informe Operativo y Filtros Tácticos</h3>
+          <div className="glass-filtros__acciones">
+            <button type="button" className="btn btn--texto" onClick={limpiarFiltros}>
+              Limpiar filtros
+            </button>
+            <button type="button" className="btn btn--texto" onClick={() => window.print()}>
+              Imprimir listado
+            </button>
+          </div>
+        </div>
+
+        <div className="glass-filtros__grilla">
+          <label className="campo">
+            <span>Buscar cliente / N°</span>
+            <input
+              type="text"
+              placeholder="Razón social, email o N°..."
+              value={filtros.busqueda}
+              onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
+            />
+          </label>
+
+          <label className="campo">
+            <span>Estado</span>
+            <select
+              value={filtros.estado}
+              onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
+            >
+              <option value="">Todos los estados</option>
+              {ESTADOS_LISTA.map((est) => (
+                <option key={est.valor} value={est.valor}>
+                  {est.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="campo">
+            <span>Empleado a cargo</span>
+            <select
+              value={filtros.idEmpleado}
+              onChange={(e) => setFiltros({ ...filtros, idEmpleado: e.target.value })}
+            >
+              <option value="">Todos los empleados</option>
+              {empleadosUnicos.map((emp) => (
+                <option key={emp.idEmpleado} value={emp.idEmpleado}>
+                  {emp.nombre} {emp.apellido}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="campo">
+            <span>Máquina asignada</span>
+            <select
+              value={filtros.idMaquina}
+              onChange={(e) => setFiltros({ ...filtros, idMaquina: e.target.value })}
+            >
+              <option value="">Todas las máquinas</option>
+              <option value="SIN_ASIGNAR">Sin máquina asignada</option>
+              {maquinasUnicas.map((m) => (
+                <option key={m.idMaquina} value={m.idMaquina}>
+                  {m.marca?.nombre} {m.modelo} (N° {m.idMaquina})
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="campo">
+            <span>Fecha alta desde</span>
+            <input
+              type="date"
+              value={filtros.fechaDesde}
+              onChange={(e) => setFiltros({ ...filtros, fechaDesde: e.target.value })}
+            />
+          </label>
+
+          <label className="campo">
+            <span>Fecha alta hasta</span>
+            <input
+              type="date"
+              value={filtros.fechaHasta}
+              onChange={(e) => setFiltros({ ...filtros, fechaHasta: e.target.value })}
+            />
+          </label>
+        </div>
+      </section>
+
+      {serviciosFiltrados.length === 0 ? (
+        <p className="aviso">No se encontraron servicios con los parámetros seleccionados.</p>
       ) : (
         <div className="tabla-contenedor">
           <table className="tabla">
             <thead>
               <tr>
                 <th>N°</th>
+                <th>Fecha Alta</th>
                 <th>Cliente</th>
                 <th>Email</th>
                 <th>Prendas</th>
@@ -154,28 +340,29 @@ export default function Servicios({ rol }) {
               </tr>
             </thead>
             <tbody>
-              {servicios.map((s) => {
+              {serviciosFiltrados.map((s) => {
                 const info = estadoServicioInfo(s.estado)
                 return (
                   <tr key={s.idServicio}>
-                    <td>{s.idServicio}</td>
-                    <td>{s.solicitud?.razonSocial}</td>
-                    <td>{s.solicitud?.email}</td>
-                    <td>{contarPrendas(s)}</td>
-                    <td>
+                    <td data-label="N°">{s.idServicio}</td>
+                    <td data-label="Fecha Alta">{formatearFecha(s.fechaAlta)}</td>
+                    <td data-label="Cliente">{s.solicitud?.razonSocial}</td>
+                    <td data-label="Email">{s.solicitud?.email}</td>
+                    <td data-label="Prendas">{contarPrendas(s)}</td>
+                    <td data-label="Empleado a cargo">
                       {s.empleado?.nombre} {s.empleado?.apellido}
                     </td>
-                    <td>
+                    <td data-label="Máquina">
                       {s.maquina
                         ? `${s.maquina.marca?.nombre ?? ''} ${s.maquina.modelo ?? ''}`.trim()
                         : '—'}
                     </td>
-                    <td>
+                    <td data-label="Estado">
                       <span className={`estado-badge estado-badge--${info.clase}`}>
                         {info.nombre}
                       </span>
                     </td>
-                    <td className="celda-acciones">
+                    <td data-label="Acciones" className="celda-acciones">
                       <button className="btn btn--texto" onClick={() => setDetalle(s)}>
                         Ver
                       </button>
@@ -183,7 +370,9 @@ export default function Servicios({ rol }) {
                         <button
                           className="btn btn--texto"
                           onClick={() =>
-                            s.estado === 0 ? setProgramar(s) : cambiarEstado(s, SIGUIENTE[s.estado])
+                            s.estado === 0
+                              ? setProgramar(s)
+                              : cambiarEstado(s, SIGUIENTE[s.estado])
                           }
                         >
                           {ACCION[s.estado]}
@@ -202,6 +391,22 @@ export default function Servicios({ rol }) {
                 )
               })}
             </tbody>
+            <tfoot>
+              <tr className="tabla-pie-operativo">
+                <td colSpan="4" data-label="Registros">
+                  <strong>Totales del listado ({serviciosFiltrados.length} registros):</strong>
+                </td>
+                <td data-label="Prendas">
+                  <strong>{resumenOperativo.prendas} u.</strong>
+                </td>
+                <td colSpan="2" data-label="Peso total">
+                  <strong>Peso total: {resumenOperativo.kilos.toFixed(1)} kg</strong>
+                </td>
+                <td colSpan="2" data-label="Total estimado">
+                  <strong>Total est.: ${resumenOperativo.monto.toLocaleString('es-AR')}</strong>
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       )}
@@ -252,6 +457,10 @@ export default function Servicios({ rol }) {
                     {estadoServicioInfo(detalle.estado).nombre}
                   </span>
                 </dd>
+              </div>
+              <div className="detalle__fila">
+                <dt>Fecha de alta</dt>
+                <dd>{formatearFecha(detalle.fechaAlta)}</dd>
               </div>
               <div className="detalle__fila">
                 <dt>Cliente</dt>

@@ -82,18 +82,18 @@ export default function Maquinas({ rol }) {
                 const info = estadoInfo(m.estado)
                 return (
                   <tr key={m.idMaquina}>
-                    <td>{m.idMaquina}</td>
-                    <td>{m.marca?.nombre}</td>
-                    <td>{m.modelo}</td>
-                    <td>{m.tamano}</td>
-                    <td>{m.marca?.pais}</td>
-                    <td>{m.periodoMant}</td>
-                    <td>
+                    <td data-label="N°">{m.idMaquina}</td>
+                    <td data-label="Marca">{m.marca?.nombre}</td>
+                    <td data-label="Modelo">{m.modelo}</td>
+                    <td data-label="Tamaño">{m.tamano}</td>
+                    <td data-label="Procedencia">{m.marca?.pais}</td>
+                    <td data-label="Período mant.">{m.periodoMant}</td>
+                    <td data-label="Estado">
                       <span className={`estado-badge estado-badge--${info.clase}`}>
                         {info.nombre}
                       </span>
                     </td>
-                    <td className="celda-acciones">
+                    <td data-label="Acciones" className="celda-acciones">
                       <button className="btn btn--texto" onClick={() => setDetalle(m)}>
                         Ver
                       </button>

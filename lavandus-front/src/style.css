@@ -28,7 +28,11 @@
 /* --------------------------------------------------------------------------
    2. RESET Y BASE
    -------------------------------------------------------------------------- */
-
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 html,
 body {
@@ -138,6 +142,8 @@ select {
   gap: 0.5rem;
   font-weight: 700;
   color: var(--verde-principal);
+  cursor: pointer;
+  user-select: none;
 }
 
 .barra__logo {
@@ -679,4 +685,600 @@ select {
 .estado-badge--cancelada {
   background: #fdeaea;
   color: #b3352d;
+}
+/* =========================================================
+   DASHBOARD GERENCIAL - ESTÉTICA GLASSMORPHISM
+   ========================================================= */
+.glass-dashboard {
+  position: relative;
+  margin-bottom: 1.75rem;
+  padding: 1.5rem;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.82) 0%,
+    rgba(30, 41, 59, 0.75) 50%,
+    rgba(15, 23, 42, 0.88) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+  overflow: hidden;
+}
+
+/* Luces ambientales de fondo para acentuar el efecto vidrio */
+.glass-dashboard::before,
+.glass-dashboard::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.glass-dashboard::before {
+  width: 240px;
+  height: 240px;
+  background: rgba(56, 189, 248, 0.22);
+  top: -60px;
+  left: -40px;
+}
+
+.glass-dashboard::after {
+  width: 260px;
+  height: 260px;
+  background: rgba(168, 85, 247, 0.2);
+  bottom: -80px;
+  right: -40px;
+}
+
+.glass-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.glass-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.glass-subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.glass-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+}
+
+/* Tarjetas internas de cristal */
+.glass-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 1.15rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.glass-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.glass-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.glass-kpi__label {
+  font-size: 0.8rem;
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.glass-kpi__value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.glass-kpi__meta {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Grilla de gráficos */
+.glass-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.glass-card__title {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+/* Dona SVG */
+.glass-donut-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.glass-donut-total {
+  fill: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.glass-donut-sub {
+  fill: #94a3b8;
+  font-size: 0.7rem;
+}
+
+.glass-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.glass-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.glass-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.glass-legend__label {
+  color: #cbd5e1;
+  min-width: 85px;
+}
+
+.glass-legend__val {
+  color: #ffffff;
+}
+
+/* Barras horizontales */
+.glass-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.glass-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  margin-bottom: 0.3rem;
+  color: #e2e8f0;
+}
+
+.glass-bar-track {
+  height: 8px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.glass-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.glass-bar-fill--cyan {
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+}
+
+.glass-bar-fill--purple {
+  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+}
+
+.glass-empty {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Barra de filtros operativos */
+.glass-filtros {
+  margin-bottom: 1.25rem;
+  padding: 1.15rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
+.glass-filtros__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.glass-filtros__encabezado h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.glass-filtros__acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.glass-filtros__grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+}
+
+.tabla-pie-operativo td {
+  background: rgba(241, 245, 249, 0.8);
+  border-top: 2px solid #cbd5e1;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Menú Principal */
+.menu-subtitulo {
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+  margin-top: 0.2rem;
+}
+
+.menu-accesos {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   16. DISEÑO RESPONSIVE PARA MÓVILES Y TABLETS
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Barra superior adaptable */
+  .barra {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.65rem 1rem;
+    gap: 0.6rem;
+    justify-content: space-between;
+  }
+
+  .barra__usuario {
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .barra__nav {
+    order: 3;
+    flex-basis: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.2rem;
+    gap: 0.35rem;
+    scrollbar-width: none;
+  }
+
+  .barra__nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .barra__link {
+    white-space: nowrap;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.88rem;
+    flex-shrink: 0;
+  }
+
+  /* Contenedor y encabezados */
+  .contenido {
+    padding: 1.15rem 0.85rem;
+  }
+
+  .encabezado-pagina {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .encabezado-pagina > .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .menu-accesos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .menu-accesos .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Dashboard Gerencial en móviles */
+  .glass-dashboard {
+    padding: 1.1rem 0.95rem;
+    border-radius: 16px;
+    margin-bottom: 1.25rem;
+  }
+
+  .glass-kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .glass-kpi__value {
+    font-size: 1.35rem;
+  }
+
+  .glass-charts-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .glass-bar-header {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  /* Filtros operativos */
+  .glass-filtros {
+    padding: 0.95rem;
+  }
+
+  .glass-filtros__grilla {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Tablas convertidas en tarjetas (cards) para móvil */
+  .tabla-contenedor {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow-x: visible;
+  }
+
+  .tabla thead {
+    display: none;
+  }
+
+  .tabla tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tabla tbody tr {
+    display: block;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding: 0.35rem 0;
+  }
+
+  .tabla tbody td[data-label] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 1rem;
+    white-space: normal;
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .tabla tbody td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--texto-suave);
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  .tabla tbody td.celda-acciones {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    padding-top: 0.65rem;
+    background: rgba(242, 245, 247, 0.5);
+  }
+
+  /* Pie de tabla operativo en móvil */
+  .tabla tfoot {
+    display: block;
+    margin-top: 0.75rem;
+  }
+
+  .tabla tfoot tr.tabla-pie-operativo {
+    display: block;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+  }
+
+  .tabla tfoot tr.tabla-pie-operativo td[data-label] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    border-top: none;
+    border-bottom: 1px solid var(--borde);
+    white-space: normal;
+  }
+
+  .tabla tfoot tr.tabla-pie-operativo td[data-label]:last-child {
+    border-bottom: none;
+  }
+
+  .tabla tfoot tr.tabla-pie-operativo td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+  }
+
+  /* Tablas internas dentro de modales (ej. detalle de prendas) mantienen formato compacto */
+  .modal .tabla-contenedor {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    overflow-x: auto;
+  }
+
+  .modal .tabla thead {
+    display: table-header-group;
+  }
+
+  .modal .tabla tbody {
+    display: table-row-group;
+  }
+
+  .modal .tabla tbody tr {
+    display: table-row;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Modales y detalles en móvil */
+  .modal-fondo {
+    padding: 0.6rem;
+    align-items: flex-end;
+  }
+
+  .modal {
+    padding: 1.35rem 1.1rem;
+    max-height: 92vh;
+    border-radius: var(--radio);
+  }
+
+  .detalle__fila {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .detalle__fila dd {
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 480px) {
+  .usuario {
+    font-size: 0.82rem;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rol-badge {
+    font-size: 0.68rem;
+    padding: 0.15rem 0.45rem;
+  }
+
+  .login-tarjeta {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .glass-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .glass-filtros__grilla {
+    grid-template-columns: 1fr;
+  }
+
+  .glass-donut-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .glass-legend {
+    width: 100%;
+  }
+
+  .glass-legend__item {
+    justify-content: space-between;
+  }
+
+  .formulario__acciones {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .formulario__acciones .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .cliente-fondo {
+    padding: 1rem 0.65rem;
+  }
+
+  .cliente-resumen {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
 }

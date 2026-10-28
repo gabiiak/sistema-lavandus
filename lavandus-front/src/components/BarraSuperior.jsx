@@ -5,7 +5,16 @@ export default function BarraSuperior({ sesion, vista, onCambiarVista, onSalir }
 
   return (
     <header className="barra">
-      <div className="barra__marca">
+      <div
+        className="barra__marca"
+        onClick={() => onCambiarVista('inicio')}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') onCambiarVista('inicio')
+        }}
+        title="Ir al menú principal"
+      >
         <span className="barra__logo" aria-hidden="true">L</span>
         <span className="barra__nombre">Lavandus</span>
       </div>

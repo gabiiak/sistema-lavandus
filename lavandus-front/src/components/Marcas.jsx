@@ -65,9 +65,9 @@ export default function Marcas() {
                   title="Seleccionar para editar"
                   onClick={() => setFormulario(marca)}
                 >
-                  <td>{marca.idMarca}</td>
-                  <td>{marca.nombre}</td>
-                  <td>{marca.pais}</td>
+                  <td data-label="N°">{marca.idMarca}</td>
+                  <td data-label="Nombre">{marca.nombre}</td>
+                  <td data-label="País procedente">{marca.pais}</td>
                 </tr>
               ))}
             </tbody>

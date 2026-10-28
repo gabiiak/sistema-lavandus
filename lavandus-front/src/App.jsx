@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { api } from './api.js'
 import Login from './components/Login.jsx'
 import BarraSuperior from './components/BarraSuperior.jsx'
+import MenuPrincipal from './components/MenuPrincipal.jsx'
 import Maquinas from './components/Maquinas.jsx'
 import Empleados from './components/Empleados.jsx'
 import Marcas from './components/Marcas.jsx'
@@ -10,9 +11,8 @@ import TiposPrenda from './components/TiposPrenda.jsx'
 
 const SESION_KEY = 'lavandus.sesion'
 
-// Los encargados (servicio y operaciones) aterrizan en la pestaña Servicios.
-const vistaInicial = (rol) =>
-  rol === 'ENCARGADO_SERVICIO' || rol === 'ENCARGADO_OPERACIONES' ? 'servicios' : 'maquinas'
+// Al iniciar sesión todos aterrizan en el Menú Principal (con el Dashboard).
+const vistaInicial = () => 'inicio'
 
 export default function App() {
   // Si hay sesión guardada en sessionStorage, no pedimos login de nuevo.
@@ -37,7 +37,7 @@ export default function App() {
     }
     sessionStorage.removeItem(SESION_KEY)
     setSesion(null)
-    setVista('maquinas')
+    setVista('inicio')
   }
 
   if (!sesion) return <Login onIngresar={iniciarSesion} />
@@ -55,7 +55,9 @@ export default function App() {
         onSalir={cerrarSesion}
       />
       <main className="contenido">
-        {vista === 'empleados' && esAdmin ? (
+        {vista === 'inicio' ? (
+          <MenuPrincipal sesion={sesion} onCambiarVista={setVista} />
+        ) : vista === 'empleados' && esAdmin ? (
           <Empleados />
         ) : vista === 'marcas' && esAdmin ? (
           <Marcas />

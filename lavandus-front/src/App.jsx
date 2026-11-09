@@ -66,7 +66,7 @@ export default function App() {
         ) : vista === 'servicios' && puedeServicios ? (
           <Servicios rol={sesion.rol} />
         ) : (
-          <Maquinas rol={sesion.rol} />
+          <Maquinas rol={sesion.rol} sesion={sesion} />
         )}
       </main>
     </>

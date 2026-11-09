@@ -11,6 +11,32 @@ ON CONFLICT (email) DO NOTHING;
 -- No se siembran máquinas: la tabla no tiene una restricción de unicidad y
 -- se duplicarían en cada arranque. Las máquinas se crean desde la app (solo ADMIN).
 
+-- Migración de registros existentes de maquina_lavadora:
+-- Convierte la columna 'tamano' de texto a entero (capacidad en kg) sin perder registros existentes
+-- y rellena cualquier valor nulo previo para evitar errores al leer la entidad.
+ALTER TABLE maquina_lavadora ADD COLUMN IF NOT EXISTS tamano INTEGER DEFAULT 25;
+ALTER TABLE maquina_lavadora ADD COLUMN IF NOT EXISTS capacidad DOUBLE PRECISION DEFAULT 0;
+ALTER TABLE maquina_lavadora ALTER COLUMN tamano DROP DEFAULT;
+
+ALTER TABLE maquina_lavadora
+ALTER COLUMN tamano TYPE INTEGER
+USING (
+    CASE
+        WHEN tamano IS NULL THEN 25
+        WHEN tamano::text ~ '[0-9]+' THEN CAST(substring(tamano::text FROM '[0-9]+') AS INTEGER)
+        WHEN LOWER(tamano::text) LIKE '%chica%' OR LOWER(tamano::text) LIKE '%peque%' THEN 15
+        WHEN LOWER(tamano::text) LIKE '%mediana%' THEN 25
+        WHEN LOWER(tamano::text) LIKE '%grande%' OR LOWER(tamano::text) LIKE '%industrial%' THEN 50
+        ELSE 25
+    END
+);
+
+UPDATE maquina_lavadora SET tamano = CAST(ROUND(capacidad) AS INTEGER) WHERE capacidad > 0;
+UPDATE maquina_lavadora SET tamano = 25 WHERE tamano IS NULL OR tamano <= 0;
+ALTER TABLE maquina_lavadora ALTER COLUMN tamano SET DEFAULT 25;
+ALTER TABLE maquina_lavadora ALTER COLUMN tamano SET NOT NULL;
+ALTER TABLE maquina_lavadora DROP COLUMN IF EXISTS capacidad;
+
 -- Tipos de prenda de ejemplo (peso por unidad en kg y precio unitario en ARS).
 INSERT INTO tipo_prenda (nombre, peso, precio) VALUES
     ('Camisa', 0.5, 1000.00),

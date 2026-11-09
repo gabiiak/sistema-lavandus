@@ -28,6 +28,8 @@ const esActivo = (estado) => estado !== 5 && estado !== 6
 const contarPrendas = (servicio) =>
   (servicio.solicitud?.detalles ?? []).reduce((total, d) => total + d.cantidad, 0)
 
+const dosDecimales = (valor) => Number(valor ?? 0).toFixed(2)
+
 // Formatea un LocalDateTime ISO a dd/mm/aaaa hh:mm
 const formatearFecha = (valor) => {
   if (!valor) return '—'
@@ -400,10 +402,16 @@ export default function Servicios({ rol }) {
                   <strong>{resumenOperativo.prendas} u.</strong>
                 </td>
                 <td colSpan="2" data-label="Peso total">
-                  <strong>Peso total: {resumenOperativo.kilos.toFixed(1)} kg</strong>
+                  <strong>Peso total: {dosDecimales(resumenOperativo.kilos)} kg</strong>
                 </td>
                 <td colSpan="2" data-label="Total estimado">
-                  <strong>Total est.: ${resumenOperativo.monto.toLocaleString('es-AR')}</strong>
+                  <strong>
+                    Total est.: $
+                    {resumenOperativo.monto.toLocaleString('es-AR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </strong>
                 </td>
               </tr>
             </tfoot>
@@ -490,11 +498,11 @@ export default function Servicios({ rol }) {
               </div>
               <div className="detalle__fila">
                 <dt>Peso total</dt>
-                <dd>{detalle.solicitud?.pesoTotal} kg</dd>
+                <dd>{dosDecimales(detalle.solicitud?.pesoTotal)} kg</dd>
               </div>
               <div className="detalle__fila">
                 <dt>Precio estimado</dt>
-                <dd>${detalle.solicitud?.precioEstimado}</dd>
+                <dd>${dosDecimales(detalle.solicitud?.precioEstimado)}</dd>
               </div>
             </dl>
 
@@ -513,7 +521,7 @@ export default function Servicios({ rol }) {
                     <tr key={d.idTipoPrenda}>
                       <td>{d.nombre}</td>
                       <td>{d.cantidad}</td>
-                      <td>${d.subtotal}</td>
+                      <td>${dosDecimales(d.subtotal)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -588,7 +596,7 @@ export default function Servicios({ rol }) {
 }
 
 // Selección de una máquina operativa para programar el servicio
-function ProgramarMaquina({ onGuardar, onCancelar }) {
+function ProgramarMaquina({ servicio, onGuardar, onCancelar }) {
   const [maquinas, setMaquinas] = useState([])
   const [idMaquina, setIdMaquina] = useState('')
   const [error, setError] = useState('')
@@ -605,6 +613,14 @@ function ProgramarMaquina({ onGuardar, onCancelar }) {
     e.preventDefault()
     if (!idMaquina) {
       setError('Seleccioná una máquina operativa')
+      return
+    }
+    const maquinaElegida = maquinas.find((m) => m.idMaquina === Number(idMaquina))
+    const pesoServicio = servicio?.solicitud?.pesoTotal ?? 0
+    if (maquinaElegida && pesoServicio > maquinaElegida.tamano) {
+      setError(
+        `El peso total del servicio (${dosDecimales(pesoServicio)} kg) supera la capacidad máxima de la máquina seleccionada (${maquinaElegida.tamano} kg)`
+      )
       return
     }
     setEnviando(true)
@@ -628,7 +644,7 @@ function ProgramarMaquina({ onGuardar, onCancelar }) {
             <option value="">Seleccioná una máquina</option>
             {maquinas.map((m) => (
               <option key={m.idMaquina} value={m.idMaquina}>
-                {m.marca?.nombre} {m.modelo} (N° {m.idMaquina})
+                {m.marca?.nombre} {m.modelo} (N° {m.idMaquina} — {m.tamano} kg)
               </option>
             ))}
           </select>

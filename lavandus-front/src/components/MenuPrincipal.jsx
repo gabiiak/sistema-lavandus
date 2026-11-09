@@ -158,7 +158,7 @@ export default function MenuPrincipal({ sesion, onCambiarVista }) {
             <div className="glass-card glass-kpi">
               <span className="glass-kpi__label">Volumen procesado</span>
               <strong className="glass-kpi__value">
-                {estadisticas.kilosTotales.toFixed(1)} kg
+                {estadisticas.kilosTotales.toFixed(2)} kg
               </strong>
               <span className="glass-kpi__meta">
                 En {estadisticas.enProceso} servicios activos hoy

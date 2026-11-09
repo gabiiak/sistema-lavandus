@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -75,6 +76,9 @@ public class SolicitudService {
             solicitud.agregarDetalle(detalle);
         }
 
+        pesoTotal = Math.round(pesoTotal * 100.0) / 100.0;
+        precioEstimado = precioEstimado.setScale(2, RoundingMode.HALF_UP);
+
         if (pesoTotal > PESO_MAXIMO) {
             throw new IllegalArgumentException(
                     "El peso total de la solicitud no puede superar los " + (int) PESO_MAXIMO + " kg");
@@ -108,20 +112,28 @@ public class SolicitudService {
         List<SolicitudResponse.Detalle> detalles = solicitud.getDetalles().stream()
                 .map(d -> {
                     TipoPrenda tipo = d.getTipoPrenda();
-                    BigDecimal subtotal = tipo.getPrecio().multiply(BigDecimal.valueOf(d.getCantidad()));
+                    double pesoRedondeado = Math.round(tipo.getPeso() * 100.0) / 100.0;
+                    BigDecimal precioRedondeado = tipo.getPrecio().setScale(2, RoundingMode.HALF_UP);
+                    BigDecimal subtotal = precioRedondeado.multiply(BigDecimal.valueOf(d.getCantidad()))
+                            .setScale(2, RoundingMode.HALF_UP);
                     return new SolicitudResponse.Detalle(
-                            tipo.getIdTipoPrenda(), tipo.getNombre(), tipo.getPeso(),
-                            tipo.getPrecio(), d.getCantidad(), subtotal);
+                            tipo.getIdTipoPrenda(), tipo.getNombre(), pesoRedondeado,
+                            precioRedondeado, d.getCantidad(), subtotal);
                 })
                 .toList();
+
+        double pesoTotalRedondeado = Math.round(solicitud.getPesoTotal() * 100.0) / 100.0;
+        BigDecimal precioEstimadoRedondeado = solicitud.getPrecioEstimado() != null
+                ? solicitud.getPrecioEstimado().setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
 
         return new SolicitudResponse(
                 solicitud.getIdSolicitud(),
                 solicitud.getNombreCliente(),
                 solicitud.getEmail(),
                 solicitud.getRazonSocial(),
-                solicitud.getPesoTotal(),
-                solicitud.getPrecioEstimado(),
+                pesoTotalRedondeado,
+                precioEstimadoRedondeado,
                 detalles);
     }
 

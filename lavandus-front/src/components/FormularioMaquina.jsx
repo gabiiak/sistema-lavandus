@@ -32,14 +32,28 @@ export default function FormularioMaquina({ inicial, onGuardar, onCancelar }) {
 
   const enviar = async (e) => {
     e.preventDefault()
+    const tamano = Number.parseInt(datos.tamano, 10)
     if (!datos.idMarca || !datos.modelo.trim()) {
       setError('Marca y modelo son obligatorios')
+      return
+    }
+    if (!datos.tamano || Number.isNaN(tamano) || tamano <= 0) {
+      setError('La capacidad de la máquina debe ser un número entero mayor a 0 kg')
       return
     }
     setEnviando(true)
     setError('')
     try {
-      await onGuardar({ ...datos, marca: { idMarca: Number(datos.idMarca) } }, inicial?.idMaquina)
+      await onGuardar(
+        {
+          modelo: datos.modelo.trim(),
+          tamano,
+          periodoMant: datos.periodoMant,
+          estado: datos.estado,
+          marca: { idMarca: Number(datos.idMarca) },
+        },
+        inicial?.idMaquina
+      )
     } catch (fallo) {
       setError(fallo.message || 'No se pudo guardar la máquina')
       setEnviando(false)
@@ -80,11 +94,15 @@ export default function FormularioMaquina({ inicial, onGuardar, onCancelar }) {
         </label>
 
         <label className="campo">
-          <span>Tamaño</span>
+          <span>Capacidad (kg) *</span>
           <input
+            type="number"
+            step="1"
+            min="1"
             value={datos.tamano}
             onChange={(e) => cambiar('tamano', e.target.value)}
-            placeholder="Ej: Grande"
+            placeholder="Ej: 25"
+            required
           />
         </label>
 

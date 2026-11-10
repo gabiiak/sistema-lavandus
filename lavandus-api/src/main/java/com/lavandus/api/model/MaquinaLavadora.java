@@ -16,8 +16,9 @@ public class MaquinaLavadora {
     @JoinColumn(name = "id_marca", nullable = false)
     private Marca marca;
 
-    @Column(name = "tamano", length = 50)
-    private String tamano;
+    // Capacidad máxima de carga en kilogramos (entero)
+    @Column(name = "tamano", nullable = false, columnDefinition = "integer default 25")
+    private int tamano;
 
     @Column(name = "modelo", length = 100)
     private String modelo;
@@ -36,8 +37,8 @@ public class MaquinaLavadora {
     public void setIdMaquina(Integer idMaquina) { this.idMaquina = idMaquina; }
     public Marca getMarca() { return marca; }
     public void setMarca(Marca marca) { this.marca = marca; }
-    public String getTamano() { return tamano; }
-    public void setTamano(String tamano) { this.tamano = tamano; }
+    public int getTamano() { return tamano; }
+    public void setTamano(int tamano) { this.tamano = tamano; }
     public String getModelo() { return modelo; }
     public void setModelo(String modelo) { this.modelo = modelo; }
     public String getPeriodoMant() { return periodoMant; }

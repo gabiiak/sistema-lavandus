@@ -83,6 +83,7 @@ public class ServicioService {
         // Si viene máquina, se programa y se ocupa; si no, queda pendiente.
         if (request.getIdMaquina() != null) {
             MaquinaLavadora maquina = resolverMaquinaOperativa(request.getIdMaquina());
+            validarCapacidadMaquina(maquina, solicitud);
             ocupar(maquina);
             servicio.setMaquina(maquina);
             servicio.setEstado(EstadoServicio.PROGRAMADA);
@@ -115,8 +116,9 @@ public class ServicioService {
             servicio.setEstado(EstadoServicio.CANCELADA);
         } else if (nuevo == siguiente(actual)) {
             if (nuevo == EstadoServicio.PROGRAMADA) {
-                // Programar: requiere asignar una máquina operativa
+                // Programar: requiere asignar una máquina operativa y validar su capacidad
                 MaquinaLavadora maquina = resolverMaquinaOperativa(request.getIdMaquina());
+                validarCapacidadMaquina(maquina, servicio.getSolicitud());
                 ocupar(maquina);
                 servicio.setMaquina(maquina);
             }
@@ -180,6 +182,18 @@ public class ServicioService {
             throw new IllegalArgumentException("La máquina " + idMaquina + " no está operativa");
         }
         return maquina;
+    }
+
+    // Valida que el peso total de la solicitud no supere la capacidad máxima de la máquina
+    private void validarCapacidadMaquina(MaquinaLavadora maquina, Solicitud solicitud) {
+        double pesoTotal = Math.round(solicitud.getPesoTotal() * 100.0) / 100.0;
+        int capacidadMaxima = maquina.getTamano();
+        if (pesoTotal > capacidadMaxima) {
+            throw new IllegalArgumentException(
+                    "El peso total del servicio (" + String.format(java.util.Locale.US, "%.2f", pesoTotal)
+                            + " kg) supera la capacidad máxima de la máquina seleccionada ("
+                            + capacidadMaxima + " kg)");
+        }
     }
 
     private void ocupar(MaquinaLavadora maquina) {

@@ -73,12 +73,12 @@ export default function Empleados() {
             <tbody>
               {empleados.map((emp) => (
                 <tr key={emp.idEmpleado}>
-                  <td>{emp.idEmpleado}</td>
-                  <td>{emp.nombre}</td>
-                  <td>{emp.apellido}</td>
-                  <td>{emp.email}</td>
-                  <td>{emp.genero}</td>
-                  <td>
+                  <td data-label="N°">{emp.idEmpleado}</td>
+                  <td data-label="Nombre">{emp.nombre}</td>
+                  <td data-label="Apellido">{emp.apellido}</td>
+                  <td data-label="Email">{emp.email}</td>
+                  <td data-label="Género">{emp.genero}</td>
+                  <td data-label="Rol">
                     <span
                       className={
                         'rol-badge ' +
@@ -88,7 +88,7 @@ export default function Empleados() {
                       {emp.rol}
                     </span>
                   </td>
-                  <td className="celda-acciones">
+                  <td data-label="Acciones" className="celda-acciones">
                     <button className="btn btn--texto" onClick={() => setFormulario(emp)}>
                       Editar
                     </button>

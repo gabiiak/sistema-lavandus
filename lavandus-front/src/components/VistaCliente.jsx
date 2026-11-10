@@ -4,10 +4,10 @@ import { api } from '../api.js'
 const FILA_VACIA = { idTipoPrenda: '', cantidad: 1 }
 
 const formatearPrecio = (valor) =>
-  '$ ' + Number(valor).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  '$ ' + Number(valor ?? 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 const formatearPeso = (valor) =>
-  Number(valor).toLocaleString('es-AR', { maximumFractionDigits: 2 }) + ' kg'
+  Number(valor ?? 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kg'
 
 // Vista pública del cliente: elegir prendas, ver el estimado y enviar la solicitud.
 export default function VistaCliente() {

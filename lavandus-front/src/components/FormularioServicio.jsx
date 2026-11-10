@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
 
+const dosDecimales = (valor) => Number(valor ?? 0).toFixed(2)
+
 // Alta de un servicio de lavado a partir de una solicitud disponible.
 export default function FormularioServicio({ onGuardar, onCancelar }) {
   const [solicitudes, setSolicitudes] = useState([])
@@ -27,6 +29,25 @@ export default function FormularioServicio({ onGuardar, onCancelar }) {
       setError('La solicitud y el empleado a cargo son obligatorios')
       return
     }
+
+    const solicitudElegida = solicitudes.find(
+      (s) => s.idSolicitud === Number(datos.idSolicitud)
+    )
+    const maquinaElegida = datos.idMaquina
+      ? maquinas.find((m) => m.idMaquina === Number(datos.idMaquina))
+      : null
+
+    if (
+      solicitudElegida &&
+      maquinaElegida &&
+      solicitudElegida.pesoTotal > maquinaElegida.tamano
+    ) {
+      setError(
+        `El peso total del servicio (${dosDecimales(solicitudElegida.pesoTotal)} kg) supera la capacidad máxima de la máquina seleccionada (${maquinaElegida.tamano} kg)`
+      )
+      return
+    }
+
     setEnviando(true)
     setError('')
     try {
@@ -56,7 +77,7 @@ export default function FormularioServicio({ onGuardar, onCancelar }) {
             <option value="">Seleccioná una solicitud</option>
             {solicitudes.map((s) => (
               <option key={s.idSolicitud} value={s.idSolicitud}>
-                {s.razonSocial} — {s.email}
+                {s.razonSocial} — {s.email} ({dosDecimales(s.pesoTotal)} kg)
               </option>
             ))}
           </select>
@@ -84,7 +105,7 @@ export default function FormularioServicio({ onGuardar, onCancelar }) {
             <option value="">Sin asignar (queda Pendiente)</option>
             {maquinas.map((m) => (
               <option key={m.idMaquina} value={m.idMaquina}>
-                {m.marca?.nombre} {m.modelo} (N° {m.idMaquina})
+                {m.marca?.nombre} {m.modelo} (N° {m.idMaquina} — {m.tamano} kg)
               </option>
             ))}
           </select>
